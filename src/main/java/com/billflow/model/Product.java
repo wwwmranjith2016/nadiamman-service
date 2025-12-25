@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Transient;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -59,4 +60,7 @@ public class Product {
     //    @NotBlank(message = "stock is required")
     @Column(nullable = false)
     private Integer stock;
+
+    @Transient
+    private Integer sold;
 }

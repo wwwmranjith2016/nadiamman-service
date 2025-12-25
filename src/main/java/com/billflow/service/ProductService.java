@@ -2,6 +2,7 @@ package com.billflow.service;
 
 import com.billflow.model.Product;
 import com.billflow.model.Supplier;
+import com.billflow.repository.InvoiceItemRepository;
 import com.billflow.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final SupplierService supplierService;
+    private final InvoiceItemRepository invoiceItemRepository;
     
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        for (Product product : products) {
+            Integer sold = invoiceItemRepository.getTotalSoldQuantity(product.getId());
+            product.setSold(sold != null ? sold : 0);
+        }
+        return products;
     }
     
     public Product getProductById(Long id) {
