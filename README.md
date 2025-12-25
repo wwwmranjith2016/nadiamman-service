@@ -113,9 +113,30 @@ The application is configured to use PostgreSQL with environment variables:
 
 ## Configuration Profiles
 
-- **default**: Development profile with SQL logging enabled
-- **production**: Production profile optimized for cloud deployment
-- **docker**: Docker-specific profile with environment variable configuration
+The application supports three Spring profiles:
+
+- **default**: Development profile (local Maven runs)
+  - SQL logging enabled for debugging
+  - Port 8080
+  - Basic configuration
+
+- **production**: Production profile (Render cloud deployment)
+  - SQL logging disabled for performance
+  - Optimized logging levels
+  - Actuator endpoints enabled
+  - Database connection optimizations
+
+- **docker**: Docker-specific profile (docker-compose runs)
+  - Production-like settings
+  - Optimized for containerized environment
+  - Connection pool settings
+  - Health checks enabled
+
+### Profile Activation:
+
+- **Local Development**: No profile needed (uses default)
+- **Render Deployment**: `SPRING_PROFILES_ACTIVE=production` (set in render.yaml)
+- **Docker Compose**: `SPRING_PROFILES_ACTIVE=docker` (set in docker-compose.yml)
 
 ## Database Migrations
 
