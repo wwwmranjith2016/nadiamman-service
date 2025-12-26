@@ -6,6 +6,11 @@ Your application is now production-ready! Here's how to deploy it to Render:
 - Your code has been committed to a Git repository (GitHub, GitLab, or Bitbucket)
 - You have a Render account at https://render.com
 
+## Recent Fixes Applied
+✅ **HikariCP Configuration Fixed**: Removed custom DatabaseConfig class that was causing configuration conflicts
+✅ **Spring Boot Actuator Added**: For proper health checks and monitoring  
+✅ **PostgreSQL Configuration**: Updated to use your Neon database consistently
+
 ## Deployment Steps
 
 ### 1. Create a New Web Service on Render
@@ -59,9 +64,14 @@ After getting your Render URL, update the CORS configuration:
 ## Troubleshooting
 
 ### Common Issues:
+
 1. **Build Fails**: Check Java version and Maven build logs
-2. **Database Connection**: Verify your Neon PostgreSQL credentials
-3. **Health Check Fails**: Ensure `/actuator/health` endpoint is accessible
+2. **Database Connection Issues**: 
+   - Verify your Neon PostgreSQL credentials
+   - Check Neon database settings to allow connections from Render's IP ranges
+   - In Neon dashboard: Settings → Database → Allowed IP Ranges → Add "0.0.0.0/0" for testing
+3. **HikariCP Errors**: This has been fixed by removing the custom DatabaseConfig class
+4. **Health Check Fails**: Ensure `/actuator/health` endpoint is accessible
 
 ### Database Connection Test:
 Test your database connection by visiting:
@@ -69,10 +79,24 @@ Test your database connection by visiting:
 
 This should return a JSON response with `"status": "UP"` if everything is working correctly.
 
+### If Database Connection Still Fails:
+1. **Neon Database Settings**:
+   - Log into your Neon dashboard
+   - Go to your database settings
+   - Under "Allowed IP Ranges", add "0.0.0.0/0" (for testing purposes)
+   - Or add Render's specific IP ranges
+
+2. **Alternative - Use Render's PostgreSQL**:
+   - Create a PostgreSQL database directly in Render
+   - This is more reliable for Render deployments
+   - Update your connection string accordingly
+
 ## Success! 🎉
 Your production-ready Spring Boot application is now deployed on Render with:
 - ✅ Spring Boot Actuator for monitoring
-- ✅ PostgreSQL database connection
+- ✅ PostgreSQL database connection (fixed HikariCP conflicts)
 - ✅ Health checks for Render
 - ✅ Production-optimized configuration
 - ✅ CORS support for frontend integration
+
+The application should now start successfully without HikariCP configuration errors!
