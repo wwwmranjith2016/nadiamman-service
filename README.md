@@ -1,6 +1,6 @@
 # BillFlow - Billing Management Backend
 
-A Spring Boot backend application for managing billing, invoices, products, suppliers, and clients. Now configured for PostgreSQL database and ready for cloud deployment.
+A Spring Boot backend application for managing billing, invoices, products, suppliers, and clients. Now configured for MySQL database and ready for cloud deployment.
 
 ## Features
 
@@ -16,19 +16,51 @@ A Spring Boot backend application for managing billing, invoices, products, supp
 
 - **Backend**: Spring Boot 3.5.6
 - **Java**: Version 17
-- **Database**: PostgreSQL
+- **Database**: MySQL
 - **Build Tool**: Maven
 - **Containerization**: Docker
 - **Cloud Platform**: Render (recommended)
 
 ## Database Configuration
 
-The application is configured to use PostgreSQL with environment variables:
-- **Host**: Your PostgreSQL host (configured via SPRING_DATASOURCE_URL)
-- **Port**: 5432 (or as specified in connection string)
-- **Database**: As specified in connection string
-- **Username**: Configured via SPRING_DATASOURCE_USERNAME
-- **Password**: Configured via SPRING_DATASOURCE_PASSWORD
+The application is configured to use MySQL with environment variables for security. **Important: Never commit database credentials to version control.**
+
+### Environment Variables
+
+Required environment variables:
+- `SPRING_DATASOURCE_URL`: MySQL connection URL
+- `SPRING_DATASOURCE_USERNAME`: Database username  
+- `SPRING_DATASOURCE_PASSWORD`: Database password
+
+### Database Connection Examples
+
+**Aiven Cloud MySQL:**
+```
+SPRING_DATASOURCE_URL=jdbc:mysql://your-mysql-host:port/your-database?ssl-mode=REQUIRED&useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+SPRING_DATASOURCE_USERNAME=your-db-username
+SPRING_DATASOURCE_PASSWORD=your-secure-password
+```
+
+**AWS RDS MySQL:**
+```
+SPRING_DATASOURCE_URL=jdbc:mysql://your-rds-endpoint:3306/your-database?useSSL=true&serverTimezone=UTC
+SPRING_DATASOURCE_USERNAME=your-username
+SPRING_DATASOURCE_PASSWORD=your-password
+```
+
+**Google Cloud SQL MySQL:**
+```
+SPRING_DATASOURCE_URL=jdbc:mysql://your-instance-ip:3306/your-database?useSSL=true&serverTimezone=UTC
+SPRING_DATASOURCE_USERNAME=your-username
+SPRING_DATASOURCE_PASSWORD=your-password
+```
+
+**Local MySQL:**
+```
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/billflow?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=your-password
+```
 
 ## Local Development
 
@@ -160,9 +192,28 @@ The application uses Hibernate auto-DDL with `update` strategy. On first run, it
 ### Common Issues
 
 1. **Database Connection Issues**
-   - Verify PostgreSQL credentials
-   - Check network connectivity to database host
-   - Ensure database is accessible from deployment environment
+   
+   **Error**: `java.net.SocketException: Network unreachable` or `SQLException: Access denied for user`
+   
+   **Solutions**:
+   - **Verify Database Status**: Ensure your MySQL database is running and accessible
+   - **Check Network Connectivity**: Verify the database host is reachable from your deployment environment
+   - **Database Service Issues**: Some cloud providers may pause databases after inactivity
+   - **Firewall/Security Groups**: Ensure database allows connections from your deployment IP range
+   - **Connection String**: Verify the JDBC URL format is correct for your database provider
+   - **Credentials**: Double-check username and password are correct
+   - **SSL Configuration**: For cloud MySQL (like Aiven), ensure SSL is properly configured
+   
+   **For Aiven Cloud MySQL Users**:
+   - Check if your database is paused due to inactivity
+   - Verify your database is in an active project
+   - Ensure SSL is enabled in connection string: `?ssl-mode=REQUIRED`
+   - Check connection limits and user permissions
+   
+   **For Cloud Deployment**:
+   - Set environment variables in your deployment platform
+   - Ensure network connectivity between deployment and database
+   - Check deployment platform logs for detailed error messages
 
 2. **Port Issues**
    - Ensure port 8080 is available (or configure via PORT environment variable)
@@ -171,6 +222,42 @@ The application uses Hibernate auto-DDL with `update` strategy. On first run, it
 3. **Memory Issues**
    - Java heap size can be configured via JAVA_OPTS environment variable
    - Default: -Xmx512m -Xms256m
+   - Increase memory if experiencing OutOfMemoryError
+
+4. **Build/Deployment Issues**
+   - Ensure Maven build completes successfully: `mvn clean package`
+   - Check Java version compatibility (requires Java 17+)
+   - Verify all dependencies are available
+
+### Database Connection Testing
+
+To test database connectivity locally:
+
+```bash
+# Test connection with mysql client (if available)
+mysql -h your-mysql-host -P your-port -u your-username -p
+
+# Or use the health endpoint after deployment
+curl http://localhost:8080/actuator/health
+```
+
+### Environment Variable Setup
+
+**For Local Development (.env file):**
+```bash
+# Copy from .env.example and update values
+cp .env.example .env
+# Edit .env with your database credentials
+```
+
+**For Render Deployment:**
+1. Go to your Render service dashboard
+2. Navigate to Environment tab
+3. Add the required environment variables:
+   - `SPRING_DATASOURCE_URL`
+   - `SPRING_DATASOURCE_USERNAME` 
+   - `SPRING_DATASOURCE_PASSWORD`
+   - `SPRING_PROFILES_ACTIVE=production`
 
 ### Health Check Endpoints
 

@@ -48,5 +48,6 @@ public class InvoiceItem {
     @ElementCollection
     @CollectionTable(name = "invoice_item_serials", joinColumns = @JoinColumn(name = "invoice_item_id"))
     @Column(name = "serial_number")
+    @OrderColumn(name = "serial_order")
     private List<String> serialNumbers = new ArrayList<>();
 }

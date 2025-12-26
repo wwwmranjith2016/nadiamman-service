@@ -49,6 +49,7 @@ public class Product {
     @ElementCollection
     @CollectionTable(name = "product_serials", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "serial_number")
+    @OrderColumn(name = "serial_order")
     private List<String> serialNumbers = new ArrayList<>();
 
     @Column(nullable = false)
